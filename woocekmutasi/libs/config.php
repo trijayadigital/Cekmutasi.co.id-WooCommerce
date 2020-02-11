@@ -9,16 +9,16 @@ function get_woocekmutasi_settings()
 {
     $settings = array(
 		'title' => array(
-            'title' => __('Title', 'woocekmutasi' ),
+            'title' => __('Judul', 'woocekmutasi' ),
             'type' => 'text',
             'description' => __('WooCekmutasi', 'woocekmutasi'),
             'default' => __('WooCekmutasi', 'woocekmutasi'),
             'desc_tip'      => true,
         ),
         'description' => array(
-			'title' => __('Customer Message', 'woocommerce' ),
+			'title' => __('Deskripsi', 'woocommerce' ),
             'type' => 'textarea',
-            'description' => __('Description yang dilihat user saat checkout, baiknya dibuatkan informasi rekening bank', 'woocekmutasi' ),
+            'description' => __('Deskripsi yang dilihat user saat checkout, sebaiknya diisi informasi rekening bank tujuan pembayaran yang telah terdaftar di cekmutasi', 'woocekmutasi' ),
             'default' => '',
 			'desc_tip' => false,
         ),
@@ -34,7 +34,7 @@ function get_woocekmutasi_settings()
             'label' => __( '<br>Pilih Mode', 'woocekmutasi' ),
             'default'   =>  'testing',
             'options' => array(
-                'sandbox'       => 'Testing',
+                'sandbox'       => 'Sandbox',
                 'live'    		=> 'Production'
             ),
             'id'   => 'woocekmutasi_mode'
@@ -46,7 +46,7 @@ function get_woocekmutasi_settings()
             'id'   => 'woocekmutasi_unique_status'
         ),
 		'unique_label' => array(
-            'title' => __( 'Label Kode Unik', 'woocekmutasi' ),
+            'title' => __( 'Label Nominal Unik', 'woocekmutasi' ),
             'type' => 'text',
             'default' => 'Kode Unik',
             'css'      => 'min-width:420px;',
@@ -94,7 +94,7 @@ function get_woocekmutasi_settings()
 		'unique_range_unit' => array(
             'title' => __( 'Satuan unik berdasarkan unit', 'woocekmutasi' ),
 			'label' => 'Perhitungan Nominal Unik: Unit',
-			'description' => __( 'Batas perhitungan unique number, default menggunakan satuan (day)', 'woocekmutasi' ),
+			'description' => __( 'Batas satuan perhitungan angka unik, default menggunakan satuan (hari)', 'woocekmutasi' ),
             'type' => 'select',
             'default'   =>  'day',
             'options' => array(
@@ -106,10 +106,10 @@ function get_woocekmutasi_settings()
 			'desc_tip' => false,
         ),
 		'unique_range_amount' => array(
-            'title' => __( 'Unit Nominal Unik', 'woocekmutasi' ),
+            'title' => __( 'Satuan unik berdasarkan nominal', 'woocekmutasi' ),
             'type' => 'number',
 			'label' => 'Perhitungan Unique Number: Amount',
-            'description' => __( 'Jumlah berapa kali didalam unit untuk perhitungan unique number, jikan 1 day berarti unique akan bekerja selama 1 hari penuh', 'woocekmutasi' ),
+            'description' => __( 'Jumlah berapa kali didalam unit untuk perhitungan angka unik, jika 1 hari berarti nominal unik akan berlaku selama 1 hari (24 jam) penuh', 'woocekmutasi' ),
 			'id'   => 'woocekmutasi_unique_range_amount',
             'default' => 1,
             'custom_attributes' => array(
@@ -147,6 +147,12 @@ function get_woocekmutasi_settings()
                 '7'      		=> 'H+7',
             ),
             'id'   => 'woocekmutasi_change_day'
+        ),
+        'verify_ipn' => array(
+            'title' => __( 'Verifikasi Data IPN', 'woocekmutasi' ),
+            'type' => 'checkbox',
+            'label' => __( 'Aktifkan Untuk Mode Transaksi Riil dan Nonaktifkan untuk Testing', 'woocekmutasi' ),
+            'default' => 'no'
         ),
         'server_ip' => array(
             'title' => __( 'IP Server Anda', 'woocekmutasi' ),

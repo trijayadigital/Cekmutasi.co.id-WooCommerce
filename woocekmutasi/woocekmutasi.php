@@ -132,8 +132,7 @@ function woocommerce_gateway_woocekmutasi_init() {
 		private $bank_local = array(
 			array('code' => 'bri', 'name' =>'Bank BRI'),
 			array('code' => 'bni', 'name' =>'Bank BNI'),
-			array('code' => 'mandiri', 'name' =>'Bank Mandiri'),
-			array('code' => 'mandiri_online', 'name' =>'Mandiri Online'),
+			array('code' => 'mandiri_online', 'name' =>'Bank Mandiri'),
 			array('code' => 'bca', 'name' =>'Bank BCA'),
 			array('code' => 'bptn_jenius', 'name' =>'BTPN Jenius'),
 			array('code' => 'ovo', 'name' =>'OVO'),
@@ -203,6 +202,7 @@ function woocommerce_gateway_woocekmutasi_init() {
 			{
 				$bank_local[] = $bank['code'];
 			}
+
 			if (isset($query_string['type']) && isset($query_string['bank']))
 			{
 				if ($query_string['type'] != FALSE)
@@ -226,7 +226,7 @@ function woocommerce_gateway_woocekmutasi_init() {
 						global $wpdb;
 						$insert_ipn_params = array(
 							'payment_bank'			=> $query_string['bank'],
-							'input_data'			=> json_encode($input_params, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
+							'input_data'			=> json_encode($input_params, JSON_UNESCAPED_UNICODE),
 							'input_datetime'		=> $Datetime_Range['current'],
 						);
 
@@ -327,11 +327,11 @@ function woocommerce_gateway_woocekmutasi_init() {
 									    'payment_bank'              => $mutasi['payment_bank'],
 										'order_status'				=> $this->settings['success_status'],
 										'order_datetime_update'		=> $Datetime_Range['current'],
-										'ipn_data'					=> json_encode($mutasi, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
+										'ipn_data'					=> json_encode($mutasi, JSON_UNESCAPED_UNICODE),
 									);
 									$wpdb->update(sprintf("%s%s", $wpdb->prefix, WOOCEKMUTASI_TABLE_TRANSACTION), $update_trans_params, array('seq' => $order_payment_data->seq));
 									do_action('valid_woocekmutasi_ipn_request', $order_payment_data);
-									exit;
+									continue;
 								}
 							}
 						}
@@ -346,8 +346,6 @@ function woocommerce_gateway_woocekmutasi_init() {
 					exit("No type params (should be ipn) and bank params.");
 				}
 			}
-			
-			echo "Response.....................\r\n";
 			exit;
 		}
 
@@ -355,19 +353,28 @@ function woocommerce_gateway_woocekmutasi_init() {
 		{
 			global $woocommerce;
 			$order = new WC_Order($order_payment_data->order_id);
-			$order->update_status($this->settings['success_status']);
-			// Accept payment
-			$accept_payment = $this->set_woocekmutasi_payment_status($order, $order_payment_data);
-			
+			$order_data = $order->get_data();
+
+			if( in_array(strtoupper($order_data['status']), ['PENDING', 'ON-HOLD']) )
+			{
+				$order->update_status($this->settings['success_status']);
+				
+				if( $this->settings['verify_ipn'] == 'yes' )
+				{
+					$this->set_woocekmutasi_payment_status($order, $order_payment_data);
+				}
+				else
+				{
+					$order->payment_complete();
+				}
+			}
 		}
 
 		function woocekmutasi_success_trans_payment($order_payment_data)
 		{
 			global $woocommerce;
 			$order = new WC_Order($order_payment_data->order_id);
-			// Accept payment
 			$order->payment_complete();
-			exit;
 		}
 
 		private function set_woocekmutasi_payment_status($order, $order_payment_data)
@@ -491,7 +498,7 @@ function woocommerce_gateway_woocekmutasi_init() {
 								    'payment_bank'              => $mutasi['payment_bank'],
 									'order_status'				=> $this->settings['success_status'],
 									'order_datetime_update'		=> $Datetime_Range['current'],
-									'ipn_data'					=> json_encode($mutasi, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
+									'ipn_data'					=> json_encode($mutasi, JSON_UNESCAPED_UNICODE),
 								);
 								$wpdb->update(sprintf("%s%s", $wpdb->prefix, WOOCEKMUTASI_TABLE_TRANSACTION), $update_trans_params, array('seq' => $order_payment_data->seq));
 								// Accept payment

@@ -82,7 +82,7 @@ function get_woocekmutasi_settings()
             'title' => __( 'Tipe Kalkulasi', 'woocekmutasi' ),
             'type' => 'select',
 			'lable'	=> 'Kalkulasi kode unik',
-            'description' => __( 'Increase = Menambah unik number ke total harga<br/>Decrease = Mengurangi total harga dengan unik number', 'woocekmutasi' ),
+            'description' => __( 'Tambahkan = Menambah unik number ke total harga<br/>Kurangi = Mengurangi total harga dengan unik number', 'woocekmutasi' ),
             'default'   =>  'increase',
             'options' => array(
                 'increase'      => 'Tambahkan',

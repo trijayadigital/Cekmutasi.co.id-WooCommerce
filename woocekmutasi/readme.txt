@@ -2,8 +2,8 @@
 Contributors: pstorenet
 Tags: ecommerce, e-commerce, store, sales, sell, shop, cart, checkout, downloadable, downloads, payment, bca, mandiri, bni, bri, otomatis, mutasi, cekmutasi
 Requires at least: 4.7
-Tested up to: 4.9
-Stable tag: 3.4.2
+Tested up to: 5.3.2
+Stable tag: 4.4.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 

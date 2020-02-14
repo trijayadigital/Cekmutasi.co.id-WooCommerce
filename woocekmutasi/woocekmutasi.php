@@ -3,11 +3,11 @@
 Plugin Name: WooCekmutasi
 Plugin URI: https://cekmutasi.co.id
 Description: Cekmutasi for WooCommerce. Sistem validasi pembayaran bank otomatis oleh https://cekmutasi.co.id
-Version: 1.0.0
-Author: Cekmutasi.co.id
-Author URI: https://cekmutasi.co.id
+Version: 2.0.1
+Author: PT Trijaya Digital Grup
+Author URI: https://tridi.net
 WC requires at least: 3.1.0
-WC tested up to: 3.3.3
+WC tested up to: 3.9.2
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: woocekmutasi
@@ -473,6 +473,10 @@ function woocommerce_gateway_woocekmutasi_init() {
 								}
 							}
 						}
+					}
+					else
+					{
+						exit($collect['cekmutasi']['tmp_data']->error_message);
 					}
 
 					if (count($mutasi_data) > 0)

@@ -1,6 +1,6 @@
 <?php
 defined('WOOCEKMUTASI_TIMEZONE') OR define('WOOCEKMUTASI_TIMEZONE', 'Asia/Jakarta');
-defined('WOOCEKMUTASI_VERSION') OR define('WOOCEKMUTASI_VERSION', '1.0.0');
+defined('WOOCEKMUTASI_VERSION') OR define('WOOCEKMUTASI_VERSION', '2.0.1');
 defined('WOOCEKMUTASI_TABLE_TRANSACTION') OR define('WOOCEKMUTASI_TABLE_TRANSACTION', "woocommerce_cekmutasi_transactions");
 defined('WOOCEKMUTASI_TABLE_TRANSACTION_IPN') OR define('WOOCEKMUTASI_TABLE_TRANSACTION_IPN', 'woocommerce_cekmutasi_transactions_ipn');
 defined('WOOCEKMUTASI_TABLE_TRANSACTION_UNIQUE') OR define('WOOCEKMUTASI_TABLE_TRANSACTION_UNIQUE', "woocommerce_cekmutasi_transactions_unique");

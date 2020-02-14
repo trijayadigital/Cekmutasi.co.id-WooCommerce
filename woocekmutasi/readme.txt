@@ -29,7 +29,7 @@ Cara menginstall plugin WooCekmutasi sangatlah mudah.
 
 1. Pastikan Anda telah menginstall plugin WooCommerce karena ini merupakan addon untuk WooCommerce. Versi WooCommerce minimum untuk plugin ini adalah 3.1.0
 2. Unggah plugin ini ke folder `/wp-content/plugins/woocekmutasi`, atau install langsung melalui WordPress plugin secara instan.
-3. Aktivkan di menu 'Plugins' WordPress Anda.
+3. Aktifkan di menu 'Plugins' WordPress Anda.
 4. Masuk ke menu WooCommerce -> Settings -> Payments lalu klik Manage pada WooCekmutasi.
 5. Salin "URL IPN/Callback Notifikasi" berupa link contoh: `http://webtokoonline.com/?wc-api=wc_woocekmutasi_gateway&type=ipn&bank=bri`
 6. Lalu lakukan langkah ke-2 di bawah ini.
@@ -46,14 +46,14 @@ Dan silahkan mulai berjualan.
 
 = Tutorial =
 Selengkapnya silahkan kunjungi tutorial integrasi Cekmutasi.co.id dengan WooCommerce di sini:
-[https://cekmutasi.co.id/app/docs/cara-install-dan-setting-plugin-integrasi-cekmutasi-di-wordpress-woocommerce-5]
+[https://cekmutasi.co.id/app/docs/cara-install-dan-setting-plugin-integrasi-cekmutasi-di-wordpress-woocommerce/5]
 
 == Frequently Asked Questions ==
 
 = Bagaimana cara install dan integrasi dengan toko online saya? =
 
 Selengkapnya silahkan kunjungi tutorial integrasi Cekmutasi.co.id dengan WooCommerce di sini:
-[https://cekmutasi.co.id/app/docs/cara-install-dan-setting-plugin-integrasi-cekmutasi-di-wordpress-woocommerce-5]
+[https://cekmutasi.co.id/app/docs/cara-install-dan-setting-plugin-integrasi-cekmutasi-di-wordpress-woocommerce/5]
 
 = Apakah ada biaya langganan? =
 Ya, untuk menggunakan layanan Cekmutasi.co.id kami menerapkan sistem deposit. Dan layanan mutasi ini akan dikenakan biaya sesuai paket yang dipilih.
@@ -75,5 +75,13 @@ Sistem akan mengirim notifikasi setiap ada transaksi masuk kepada Anda melalui E
 
 = 1.0.0 =
 * Inisialisasi rilis
+
+= 2.0.0 =
+* Perbaikan bug verifikasi IPN data
+* Perbaikan kosa kata pengaturan
+* Perbaikan struktur database
+
+= 2.0.1 =
+* Perbaikan versi & dokumentasi
 
 == Upgrade Notice ==

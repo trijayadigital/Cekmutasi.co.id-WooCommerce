@@ -3,11 +3,11 @@
 Plugin Name: WooCekmutasi
 Plugin URI: https://cekmutasi.co.id
 Description: Cekmutasi for WooCommerce. Sistem validasi pembayaran bank otomatis oleh https://cekmutasi.co.id
-Version: 2.0.1
+Version: 2.1.0
 Author: PT Trijaya Digital Grup
 Author URI: https://tridi.net
 WC requires at least: 3.1.0
-WC tested up to: 3.9.2
+WC tested up to: 4.0.0
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: woocekmutasi
@@ -21,8 +21,10 @@ function woocekmutasi_install()
 {
 	global $wpdb;
 	$woocekmutasi_version = get_option("woocekmutasi_database_version");
-	if ($woocekmutasi_version != WOOCEKMUTASI_VERSION) {
+	if ($woocekmutasi_version != WOOCEKMUTASI_VERSION)
+	{
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php' );
+
 		// Table transactions
 		$sql = sprintf("CREATE TABLE IF NOT EXISTS %s%s (
 			`seq` INT(11) NOT NULL AUTO_INCREMENT,
@@ -56,18 +58,7 @@ function woocekmutasi_install()
 			WOOCEKMUTASI_TABLE_TRANSACTION
 		);
 		dbDelta($sql);
-		$sql = sprintf("CREATE TABLE %s%s (
-			`seq` INT(11) NOT NULL AUTO_INCREMENT,
-			`payment_bank` VARCHAR(16) NOT NULL,
-			`input_data` TEXT NOT NULL,
-			`input_datetime` DATETIME NOT NULL,
-			PRIMARY KEY (`seq`),
-			INDEX `payment_bank` (`payment_bank`)
-		)",
-			$wpdb->prefix,
-			WOOCEKMUTASI_TABLE_TRANSACTION_IPN
-		);
-		dbDelta($sql);
+
 		// Table transaction unique
 		$sql = sprintf("CREATE TABLE IF NOT EXISTS %s%s (
 			`seq` INT(11) NOT NULL AUTO_INCREMENT,
@@ -89,13 +80,16 @@ function woocekmutasi_install()
 			WOOCEKMUTASI_TABLE_TRANSACTION_UNIQUE
 		);
 		dbDelta($sql);
+
 		update_option("woocekmutasi_database_version", WOOCEKMUTASI_VERSION);
 	}
 }
+
 register_deactivation_hook(__FILE__, 'woocekmutasi_deactivate');
 function woocekmutasi_deactivate() {
 	delete_option('woocekmutasi_database_version');
 }
+
 register_uninstall_hook(__FILE__, 'woocekmutasi_uninstall');
 function woocekmutasi_uninstall() {
 	delete_option('woocekmutasi_database_version');
@@ -111,19 +105,17 @@ function woocekmutasi_uninstall() {
 	);
 	$wpdb->query($sql);
 }
-// INIT
+
 function woocekmutasi_check() {
     if (get_site_option('woocekmutasi_database_version') != WOOCEKMUTASI_VERSION) {
         woocekmutasi_install() ;
     }
 }
-//---------------------
-// Start Classes
-//---------------------
-add_action('plugins_loaded', 'woocommerce_gateway_woocekmutasi_init', 0);
-function woocommerce_gateway_woocekmutasi_init() {
 
-	if (!class_exists( 'WC_Payment_Gateway' )) {
+add_action('plugins_loaded', 'woocommerce_gateway_woocekmutasi_init', 0);
+function woocommerce_gateway_woocekmutasi_init()
+{
+	if ( !class_exists( 'WC_Payment_Gateway' )) {
 		return;
 	}
 
@@ -146,8 +138,9 @@ function woocommerce_gateway_woocekmutasi_init() {
 		public $title = "WooCekmutasi";
 		public $method_title = 'WooCekmutasi';
 		public $description = "WooCekmutasi";
-		function __construct() {
-			
+
+		function __construct()
+		{
 			$plugin_dir = plugin_dir_url(__FILE__);
 			$this->icon = apply_filters( 'woocommerce_gateway_icon', $plugin_dir.'/assets/images/logo.png' );
 			$this->has_fields = true;
@@ -157,15 +150,19 @@ function woocommerce_gateway_woocekmutasi_init() {
 			$this->title = $this->settings['title'];
 			$this->description = $this->settings['description'];
 			
-			if (version_compare(WOOCOMMERCE_VERSION, '2.0.0', '>=')) {
+			if (version_compare(WOOCOMMERCE_VERSION, '2.0.0', '>='))
+			{
 				add_action('woocommerce_update_options_payment_gateways_' . $this->id, array(&$this, 'process_admin_options'));
 				add_action('woocommerce_receipt_' . $this->id, array($this, 'receipt_page'));
 				add_action('woocommerce_api_'. strtolower(get_class($this)), array($this, 'check_ipn_response'));
-			} else {
+			}
+			else
+			{
 				add_action('woocommerce_update_options_payment_gateways', array(&$this, 'process_admin_options'));
 				add_action('woocommerce_receipt', array(&$this, 'receipt_page'));
 				add_action('woocommerce_api', array($this, 'check_ipn_response'));
 			}
+
 			$this->woocommerce_woocekmutasi_calculate_unique();
 
 			include_once(__DIR__ . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'cURL.php');
@@ -180,10 +177,8 @@ function woocommerce_gateway_woocekmutasi_init() {
 					}
 				}
 			}
-			// Payment Hook Listener
+
 			add_action('valid_woocekmutasi_ipn_request', array($this, 'woocekmutasi_success_ipn_request'));
-			// Success Payment
-			add_action('valid_woocekmutasi_trans_payment', array($this, 'woocekmutasi_success_trans_payment'));
 		}
 
 		function woocekmutasi_ipn_querystring($vars) {
@@ -224,17 +219,9 @@ function woocommerce_gateway_woocekmutasi_init() {
 					if ($query_string['type'] === 'ipn')
 					{
 						global $wpdb;
-						$insert_ipn_params = array(
-							'payment_bank'			=> $query_string['bank'],
-							'input_data'			=> json_encode($input_params, JSON_UNESCAPED_UNICODE),
-							'input_datetime'		=> $Datetime_Range['current'],
-						);
-
-						$x = json_decode($insert_ipn_params['input_data'], true);
-						
-						if( !empty($x['header']['Api-Signature']) )
+						if( !empty($input_params['header']['Api-Signature']) )
 						{
-						    if( !hash_equals($this->cekmutasi->api_signature, $x['header']['Api-Signature']) )
+						    if( !hash_equals($this->cekmutasi->api_signature, $input_params['header']['Api-Signature']) )
 						    {
 			        	        exit("Invalid Api Signature");
 			        	    }
@@ -244,42 +231,26 @@ function woocommerce_gateway_woocekmutasi_init() {
 						    exit("Undefined Api Signature");
 						}
 
-						$wpdb->insert(sprintf("%s%s", $wpdb->prefix, WOOCEKMUTASI_TABLE_TRANSACTION_IPN), $insert_ipn_params);
-						$new_ipn_seq = $wpdb->insert_id;
-						$sql = sprintf("SELECT input_data FROM %s%s WHERE seq = '%d'",
-							$wpdb->prefix,
-							WOOCEKMUTASI_TABLE_TRANSACTION_IPN,
-							$new_ipn_seq
-						);
-
-						$ipn_data = $wpdb->get_row($sql);
-						if (isset($ipn_data->input_data))
+						try
 						{
-							try
-							{
-								$ipn_input_data = json_decode($ipn_data->input_data);
-							}
-							catch (Exception $ex)
-							{
-								exit("Cannot json decoded input IPN: {$ex->getMessage()}");
-								//$ipn_input_data = false;
-							}
+							$ipn = json_decode(json_encode($input_params['body'], JSON_UNESCAPED_UNICODE));
 						}
-						else
+						catch (Exception $ex)
 						{
-							exit("No input data from ipn logs db.");
+							exit("Cannot json decoded input IPN: {$ex->getMessage()}");
+							//$ipn_input_data = false;
 						}
 						
 						
 						$mutasi_data = array();
-						if (isset($ipn_input_data->body->action) && isset($ipn_input_data->body->content->data))
+						if (isset($ipn->action) && isset($ipn->content->data))
 						{
-							$ipn_input_data->body->action = strtolower($ipn_input_data->body->action);
-							if ($ipn_input_data->body->action == 'payment_report')
+							$ipn->action = strtolower($ipn->action);
+							if ($ipn->action == 'payment_report')
 							{
-								if (is_array($ipn_input_data->body->content->data) && (count($ipn_input_data->body->content->data) > 0))
+								if (is_array($ipn->content->data) && (count($ipn->content->data) > 0))
 								{
-									foreach ($ipn_input_data->body->content->data as $content_data)
+									foreach ($ipn->content->data as $content_data)
 									{
 										if (isset($content_data->type) && isset($content_data->amount) && isset($content_data->description))
 										{
@@ -289,7 +260,7 @@ function woocommerce_gateway_woocekmutasi_init() {
 												$cekmutasiDatezone->setTimestamp($content_data->unix_timestamp);
 												$cekmutasiDatezone->setTimezone(new DateTimeZone(WOOCEKMUTASI_TIMEZONE));
 												$mutasi_data[] = array(
-													'payment_bank'				=> $ipn_input_data->body->content->service_code,
+													'payment_bank'				=> $ipn->content->service_code,
 													'payment_amount'			=> sprintf('%.02f', $content_data->amount),
 													'payment_description'		=> sprintf("%s", $content_data->description),
 													'payment_datetime'			=> $cekmutasiDatezone->format('Y-m-d H:i:s'),
@@ -358,164 +329,10 @@ function woocommerce_gateway_woocekmutasi_init() {
 			if( in_array(strtoupper($order_data['status']), ['PENDING', 'ON-HOLD']) )
 			{
 				$order->update_status($this->settings['success_status']);
-				
-				if( $this->settings['verify_ipn'] == 'yes' )
-				{
-					$this->set_woocekmutasi_payment_status($order, $order_payment_data);
-				}
-				else
-				{
-					$order->payment_complete();
-				}
-			}
-		}
-
-		function woocekmutasi_success_trans_payment($order_payment_data)
-		{
-			global $woocommerce;
-			$order = new WC_Order($order_payment_data->order_id);
-			$order->payment_complete();
-		}
-
-		private function set_woocekmutasi_payment_status($order, $order_payment_data)
-		{
-			$collect = array(
-				'cekmutasi'				=> array(),
-			);
-
-			// Get Transaction Data
-			$collect['transaction_data'] = $this->get_trans_data_by_seq($order_payment_data->seq);
-
-			if (!isset($collect['transaction_data']->order_id))
-			{
-				exit("Order data not exists on database");
-			}
-
-			$Datezone = new DateTime();
-			$Datezone->setTimezone(new DateTimeZone(WOOCEKMUTASI_TIMEZONE));
-			$Datetime_Range = array(
-				'current'		=> $Datezone->format('Y-m-d H:i:s'),
-			);
-
-			$collect['bank_local'] = array();
-			foreach ($this->bank_local as $bank) {
-				$collect['bank_local'][] = $bank['code'];
-			}
-
-			if (!in_array($order_payment_data->payment_bank, $collect['bank_local']))
-			{
-				$collect['input_params']['payment_bank'] = 'all';
-			}
-
-			if ($collect['transaction_data']->order_status != 'pending')
-			{
-				$collect['cekmutasi']['input_params'] = $this->cekmutasi->generate_search_params($collect['transaction_data']);
-				
-				try
-				{
-					$apiEndpoint = '/bank/search';
-					switch($collect['input_params']['payment_bank'])
-					{
-						case 'ovo':
-							$apiEndpoint = '/ovo/search';
-							break;
-
-						case 'gopay':
-							$apiEndpoint = '/gopay/search';
-							break;
-
-						default:
-							break;
-					}
-
-					$collect['cekmutasi']['api'] = $this->curl->create_curl_request('POST', $this->cekmutasi->get_api_url($apiEndpoint), $this->curl->UA, $this->curl->generate_curl_headers($this->cekmutasi->cekmutasi_headers), $collect['cekmutasi']['input_params']);
-				}
-				catch (Exception $ex)
-				{
-					throw $ex;
-					$collect['cekmutasi']['api'] = false;
-				}
-
-				if (isset($collect['cekmutasi']['api']['response']['body']))
-				{
-					try
-					{
-						$collect['cekmutasi']['tmp_data'] = json_decode($collect['cekmutasi']['api']['response']['body']);
-					}
-					catch (Exception $ex)
-					{
-						throw $ex;
-						$collect['cekmutasi']['tmp_data'] = false;
-					}
-
-					$mutasi_data = array();
-					if ( $collect['cekmutasi']['tmp_data']->success === true)
-					{
-						if (isset($collect['cekmutasi']['tmp_data']->response))
-						{
-							if (is_array($collect['cekmutasi']['tmp_data']->response) && (count($collect['cekmutasi']['tmp_data']->response) > 0))
-							{
-								foreach ($collect['cekmutasi']['tmp_data']->response as $data)
-								{
-									if ( $data->credit > 0 )
-									{
-										$cekmutasiDatezone = new DateTime();
-										$cekmutasiDatezone->setTimestamp(strtotime($data->created_at));
-										$cekmutasiDatezone->setTimezone(new DateTimeZone(WOOCEKMUTASI_TIMEZONE));
-										$mutasi_data[] = array(
-											'payment_bank'				=> (isset($data->service_code) ? $data->service_code : ''),
-											'payment_amount'			=> sprintf('%.02f', $data->amount),
-											'payment_description'		=> sprintf("%s", $data->description),
-											'payment_datetime'			=> $cekmutasiDatezone->format('Y-m-d H:i:s'),
-											'payment_type'				=> sprintf("%s", $data->type),
-										);
-									}
-								}
-							}
-						}
-					}
-					else
-					{
-						exit($collect['cekmutasi']['tmp_data']->error_message);
-					}
-
-					if (count($mutasi_data) > 0)
-					{
-						global $wpdb;
-						$all = 'all';
-						foreach ($mutasi_data as $mutasi)
-						{
-							$sql = sprintf("SELECT * FROM %s%s WHERE (payment_bank IN('%s', '%s') AND order_total = '%s' AND order_status IN('pending', 'waiting', 'on-hold')) AND ('%s' BETWEEN payment_insert AND DATE_ADD(payment_insert, INTERVAL %d DAY)) ORDER BY payment_insert DESC LIMIT 1",
-								$wpdb->prefix,
-								WOOCEKMUTASI_TABLE_TRANSACTION,
-								$mutasi['payment_bank'],
-								$all,
-								$mutasi['payment_amount'],
-								$mutasi['payment_datetime'],
-								$this->settings['change_day']
-							);
-
-							$order_payment_data = $wpdb->get_row($sql);
-							if (isset($order_payment_data->order_id))
-							{
-								$update_trans_params = array(
-								    'payment_bank'              => $mutasi['payment_bank'],
-									'order_status'				=> $this->settings['success_status'],
-									'order_datetime_update'		=> $Datetime_Range['current'],
-									'ipn_data'					=> json_encode($mutasi, JSON_UNESCAPED_UNICODE),
-								);
-								$wpdb->update(sprintf("%s%s", $wpdb->prefix, WOOCEKMUTASI_TABLE_TRANSACTION), $update_trans_params, array('seq' => $order_payment_data->seq));
-								// Accept payment
-								# Do Accept
-								do_action('valid_woocekmutasi_trans_payment', $order_payment_data);
-							}
-						}
-					}
-				}
+				$order->payment_complete();
 			}
 		}
 		
-		// FORM
 		public function admin_options()
 		{
 			echo '<h2>'.__('Cekmutasi For WooCommerce', 'woocekmutasi').'</h2>';
@@ -533,8 +350,6 @@ function woocommerce_gateway_woocekmutasi_init() {
 			echo '</table>';
 		}
 		
-		//=============================================================
-		// Transactions
 		public function process_payment($order_id)
 		{
 			global $woocommerce;
@@ -542,7 +357,7 @@ function woocommerce_gateway_woocekmutasi_init() {
 			$order = new WC_Order($order_id);
 			$unique_seq_session = WC()->session->get('unique_seq_session');
 			$order_data = $order->get_data();
-			// Set Order Data
+
 			try
 			{
 				$new_trans_seq = $this->add_woocekmutasi_order_trans($order_data, $unique_seq_session);
@@ -553,7 +368,7 @@ function woocommerce_gateway_woocekmutasi_init() {
 				return false;
 			}
 
-			if ((int)$new_trans_seq > 0)
+			if ( intval($new_trans_seq) > 0)
 			{
 				$transaction_data = $this->get_trans_data_by_seq($new_trans_seq);
 			}
@@ -564,13 +379,10 @@ function woocommerce_gateway_woocekmutasi_init() {
 
 			if ($transaction_data != FALSE)
 			{
-				// Clear cart
 				$this->clear_order_cart();
 				if ($unique_seq_session != FALSE)
 				{
-					// Set session trans seq
 					WC()->session->set('new_trans_seq', $new_trans_seq);
-					// Clear unique session
 					WC()->session->__unset('unique_seq_session');
 				}
 			
@@ -898,6 +710,7 @@ HTMLORDER;
 			if ($woocommerce->cart->subtotal <= 0) {
 				return;
 			}
+
 			if (self::$already_calculate_unique_number_fee === FALSE)
 			{
 				$unique_params = array();
@@ -940,8 +753,8 @@ HTMLORDER;
 				$string_unit = 'day';
 			}
 
-			$int_amount = (int)$int_amount;
-			// Include libraries
+			$int_amount = (int) $int_amount;
+
 			include_once(__DIR__ . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'DateZone.php');
 			$datezone = new DateZone();
 			$date_stopping = new DateTime();
@@ -1003,15 +816,19 @@ HTMLORDER;
 
 		private function woocekmutasi_get_new_unique_number()
 		{
-			$int_random = mt_rand($this->settings['unique_starting'], $this->settings['unique_stopping']);
-			return (int)$int_random;
+			do {
+				$int_random = mt_rand($this->settings['unique_starting'], $this->settings['unique_stopping']);
+				$_s = substr($int_random, -1) == '0' ? true : false;
+			} while ($_s);
+			
+			return (int) $int_random;
 		}
 
 		private function woocekmutasi_check_new_unique($unique_number, $sql_string)
 		{
 			global $wpdb;
-			$rows = 0;
-			$unique_number = (int)$unique_number;
+			$rows = 1;
+			$unique_number = (int) $unique_number;
 			$sql = (is_string($sql_string) ? $sql_string : '');
 
 			if (strlen($sql) > 0)
@@ -1019,6 +836,7 @@ HTMLORDER;
 				$sql .= sprintf(" AND (unique_amount = '%d')", $unique_number);
 				$sql .= " AND (trans_user != 0)";
 			}
+
 			$sql = str_replace('[#WPDB_PREFIX#]', $wpdb->prefix, $sql);
 			$sql = str_replace('[#TABLE_UNIQUE#]', WOOCEKMUTASI_TABLE_TRANSACTION_UNIQUE, $sql);
 			
@@ -1038,35 +856,8 @@ HTMLORDER;
 
 		private function woocekmutasi_validate_unique($woocommerce, $unique_seq)
 		{
-			$unique_seq = (int)$unique_seq;
+			$unique_seq = (int) $unique_seq;
 			self::$already_calculate_unique_number_fee = TRUE;
-			/*
-			global $wpdb;
-			if ($unique_seq > 0) {
-				$sql = sprintf("SELECT * FROM %s%s WHERE seq = '%d' LIMIT 1",
-					$wpdb->prefix,
-					WOOCEKMUTASI_TABLE_TRANSACTION_UNIQUE,
-					$unique_seq
-				);
-				try {
-					$unique_data = $wpdb->get_row($sql);
-				} catch (Exception $ex) {
-					throw $ex;
-					return false;
-				}
-				$Datezone = new DateTime();
-				$Datezone->setTimezone(new DateTimeZone(WOOCEKMUTASI_TIMEZONE));
-				if ($unique_data != FALSE) {
-					self::$already_calculate_unique_number_fee = TRUE;
-					// Add to cart
-					if(isset($unique_data->unique_amount)) {
-						$woocommerce->cart->add_fee($this->settings['unique_label'], $unique_data->unique_amount, true, '');
-					}
-				}
-			} else {
-				return false;
-			}
-			*/
 		}
 
 		//=======================================================
@@ -1093,7 +884,7 @@ function add_unique_amount_to_cart()
 {
 	global $wpdb, $woocommerce;
 	$get_unique_session_seq = WC()->session->get('unique_seq_session');
-	if ((int)$get_unique_session_seq > 0)
+	if ( intval($get_unique_session_seq) > 0)
 	{
 		$sql = sprintf("SELECT * FROM %s%s WHERE seq = '%d'",
 			$wpdb->prefix,
@@ -1106,7 +897,7 @@ function add_unique_amount_to_cart()
 		{
 			if ($woocommerce->session->chosen_payment_method == $unique_data->unique_payment_gateway)
 			{
-				if (!is_cart())
+				if ( !is_cart() )
 				{
 					$woocommerce->cart->add_fee($unique_data->unique_label, $unique_data->unique_amount, true, '');
 				}

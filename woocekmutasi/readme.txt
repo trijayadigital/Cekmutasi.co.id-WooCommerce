@@ -62,26 +62,31 @@ Ya, untuk menggunakan layanan Cekmutasi.co.id kami menerapkan sistem deposit. Da
 Ya, kami menjamin keamanan data Anda. Karena kami akan mengenkripsi data Anda, juga menggunakan protocol khusus dan menggunakan SSL yang akan mengenkripsi aktivitas Anda di browser. Sehingga keamanannya akan lebih optimal.
 
 = Berapa kali mutasi akan update? =
-Pengecekkan mutasi dilakukan 5 menit sekali.
+Pengecekkan mutasi dilakukan 3 menit sekali.
 
 = Apakah saya bisa akses Internet Banking saya bila menggunakan layanan ini? =
 Anda bisa buka iBanking Anda kapanpun, tanpa terganggu oleh Cekmutasi.co.id. Cukup nonaktifkan mutasi di dashboard Cekmutasi.co.id lalu Anda bisa login ke ibanking
 
 = Melalui apa saja saya akan menerima notifikasi? =
-Sistem akan mengirim notifikasi setiap ada transaksi masuk kepada Anda melalui Email, API dan SMS (ringkasan harian).
+Sistem akan mengirim notifikasi setiap ada transaksi masuk kepada Anda melalui Email & Callback IPN.
 
 
 == Changelog ==
 
 = 1.0.0 =
-* Inisialisasi rilis
+[NEW] Inisialisasi rilis
 
 = 2.0.0 =
-* Perbaikan bug verifikasi IPN data
-* Perbaikan kosa kata pengaturan
-* Perbaikan struktur database
+[FIX] Perbaikan bug verifikasi IPN data
+[FIX] Perbaikan kosa kata pengaturan
+[FIX] Perbaikan struktur database
 
 = 2.0.1 =
-* Perbaikan versi & dokumentasi
+[FIX] Perbaikan versi & dokumentasi
+
+= 2.1.0 =
+[FIX] Bug nominal unik tidak bekerja
+[REMOVE] Setting Verify IPN & Mode
 
 == Upgrade Notice ==
+Untuk upgrade dari versi 2.0.1 ke 2.1.0, tabel cekmutasi_transactions_ipn tidak lagi digunakan. Anda dapat menghapus tabel terkait

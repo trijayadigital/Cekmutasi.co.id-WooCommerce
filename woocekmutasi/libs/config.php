@@ -1,8 +1,7 @@
 <?php
 defined('WOOCEKMUTASI_TIMEZONE') OR define('WOOCEKMUTASI_TIMEZONE', 'Asia/Jakarta');
-defined('WOOCEKMUTASI_VERSION') OR define('WOOCEKMUTASI_VERSION', '2.0.1');
+defined('WOOCEKMUTASI_VERSION') OR define('WOOCEKMUTASI_VERSION', '2.1.0');
 defined('WOOCEKMUTASI_TABLE_TRANSACTION') OR define('WOOCEKMUTASI_TABLE_TRANSACTION', "woocommerce_cekmutasi_transactions");
-defined('WOOCEKMUTASI_TABLE_TRANSACTION_IPN') OR define('WOOCEKMUTASI_TABLE_TRANSACTION_IPN', 'woocommerce_cekmutasi_transactions_ipn');
 defined('WOOCEKMUTASI_TABLE_TRANSACTION_UNIQUE') OR define('WOOCEKMUTASI_TABLE_TRANSACTION_UNIQUE', "woocommerce_cekmutasi_transactions_unique");
 
 function get_woocekmutasi_settings()
@@ -28,17 +27,6 @@ function get_woocekmutasi_settings()
 			'label' => __( 'Aktifkan WooCekmutasi Payment Gateway', 'woocekmutasi' ),
 			'default' => 'yes'
 		),
-		'mode' => array(
-            'title' => __( 'Mode', 'woocekmutasi' ),
-            'type' => 'select',
-            'label' => __( '<br>Pilih Mode', 'woocekmutasi' ),
-            'default'   =>  'testing',
-            'options' => array(
-                'sandbox'       => 'Sandbox',
-                'live'    		=> 'Production'
-            ),
-            'id'   => 'woocekmutasi_mode'
-        ),
 		'unique_status' => array(
             'title' => __( 'Nominal Unik?', 'woocekmutasi' ),
             'type' => 'checkbox',
@@ -147,12 +135,6 @@ function get_woocekmutasi_settings()
                 '7'      		=> 'H+7',
             ),
             'id'   => 'woocekmutasi_change_day'
-        ),
-        'verify_ipn' => array(
-            'title' => __( 'Verifikasi Data IPN', 'woocekmutasi' ),
-            'type' => 'checkbox',
-            'label' => __( 'Aktifkan Untuk Mode Transaksi Riil dan Nonaktifkan untuk Testing', 'woocekmutasi' ),
-            'default' => 'no'
         ),
         'server_ip' => array(
             'title' => __( 'IP Server Anda', 'woocekmutasi' ),
